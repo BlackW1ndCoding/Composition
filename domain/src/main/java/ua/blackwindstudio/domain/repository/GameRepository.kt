@@ -1,4 +1,4 @@
-package ua.blackwindstudio.domain
+package ua.blackwindstudio.domain.repository
 
 import ua.blackwindstudio.domain.models.GameSettings
 import ua.blackwindstudio.domain.models.Difficulty

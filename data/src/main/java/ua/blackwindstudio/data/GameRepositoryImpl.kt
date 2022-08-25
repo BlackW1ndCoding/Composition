@@ -1,6 +1,6 @@
 package ua.blackwindstudio.data
 
-import ua.blackwindstudio.domain.GameRepository
+import ua.blackwindstudio.domain.repository.GameRepository
 import ua.blackwindstudio.domain.models.Difficulty
 import ua.blackwindstudio.domain.models.GameSettings
 import ua.blackwindstudio.domain.models.Question
