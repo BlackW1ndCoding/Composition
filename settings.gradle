@@ -16,3 +16,4 @@ rootProject.name = "Composition"
 include ':app'
 include ':domain'
 include ':data'
+include ':ui'
