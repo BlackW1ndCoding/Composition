@@ -3,11 +3,10 @@
 
     <style name="MainTitleStyle">
         <item name="android:textSize">30sp</item>
-        <item name="titleTextStyle">bold</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TimerTextStyle">
-        <item name="android:textAppearance">sans</item>
         <item name="android:textSize">28sp</item>
         <item name="android:textColor">@color/dark_blue</item>
     </style>
