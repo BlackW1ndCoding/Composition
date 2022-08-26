@@ -6,6 +6,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="BodyTextStyle">
+        <item name="android:textAppearance">@style/TextAppearance.Material3.BodyMedium</item>
+    </style>
+
     <style name="TimerTextStyle">
         <item name="android:textSize">28sp</item>
         <item name="android:textColor">@color/dark_blue</item>

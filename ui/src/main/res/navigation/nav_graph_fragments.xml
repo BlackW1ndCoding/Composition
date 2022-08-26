@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_fragments"
+    app:startDestination="@id/welcomeFragment">
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="ua.blackwindstudio.ui.welcome.WelcomeFragment"
+        android:label="WelcomeFragment" >
+        <action
+            android:id="@+id/action_welcomeFragment_to_chooseDifficultyFragment"
+            app:destination="@id/chooseDifficultyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chooseDifficultyFragment"
+        android:name="ua.blackwindstudio.ui.choose_difficulty.ChooseDifficultyFragment"
+        android:label="ChooseDifficultyFragment" >
+        <action
+            android:id="@+id/action_chooseDifficultyFragment_to_fragmentGame"
+            app:destination="@id/fragmentGame" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentGame"
+        android:name="ua.blackwindstudio.ui.game.FragmentGame"
+        android:label="FragmentGame" >
+        <argument
+            android:name="difficulty_level"
+            app:argType="ua.blackwindstudio.domain.models.Difficulty" />
+        <action
+            android:id="@+id/action_fragmentGame_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="ua.blackwindstudio.ui.result.ResultFragment"
+        android:label="ResultFragment" />
+</navigation>

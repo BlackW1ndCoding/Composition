@@ -2,10 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph_main"
-    app:startDestination="@id/welcomeFragment">
+    app:startDestination="@id/nav_graph_fragments">
 
-    <fragment
-        android:id="@+id/welcomeFragment"
-        android:name="ua.blackwindstudio.ui.welcome.WelcomeFragment"
-        android:label="WelcomeFragment" />
+    <include app:graph="@navigation/nav_graph_fragments" />
 </navigation>
