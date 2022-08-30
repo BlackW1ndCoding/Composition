@@ -13,6 +13,7 @@ import ua.blackwindstudio.domain.models.GameResult
 import ua.blackwindstudio.domain.models.Question
 import ua.blackwindstudio.domain.usecases.GenerateQuestionCase
 import ua.blackwindstudio.domain.usecases.GetGameSettingsCase
+import ua.blackwindstudio.ui.utils.rightAnswer
 import java.lang.ArithmeticException
 
 class GameViewModel(
@@ -34,7 +35,7 @@ class GameViewModel(
     private val _rightAnswersCount = MutableStateFlow(0)
     val rightAnswersCount: StateFlow<Int> = _rightAnswersCount
 
-    private var totalAnswersCount = 0
+    private var totalQuestionsCount = 0
 
     private val timer = createGameTimer()
 
@@ -48,11 +49,10 @@ class GameViewModel(
     }
 
     fun answerClicked(position: Int) {
-        val value = _question.value
-        if (value.sum ==
-            value.visibleNumber + value.options[position - 1]
-        ) _rightAnswersCount.value++
-        totalAnswersCount++
+        val question = _question.value
+
+        if (question.rightAnswer == question.options[position]) _rightAnswersCount.value++
+        totalQuestionsCount++
 
         if (checkGameOverCondition()) {
             gameOver()
@@ -60,21 +60,9 @@ class GameViewModel(
         _question.value = generateQuestionCase(gameSettings.maxSumValue)
     }
 
-
-    private fun generateGameOverEvent(): GameEvent.GameOver {
-        return GameEvent.GameOver(
-            GameResult(
-                winner = isWinner(),
-                rightAnswersCount = _rightAnswersCount.value,
-                totalQuestionsCount = totalAnswersCount,
-                gameSettings
-            )
-        )
-    }
-
     private fun isWinner(): Boolean {
         return try {
-            rightAnswersCount.value / totalAnswersCount * 100 > gameSettings.minRightAnswersPercent
+            rightAnswersCount.value / totalQuestionsCount * 100 > gameSettings.minRightAnswersPercent
         } catch (e: ArithmeticException) {
             false
         }
@@ -115,6 +103,17 @@ class GameViewModel(
                 generateGameOverEvent()
             )
         }
+    }
+
+    private fun generateGameOverEvent(): GameEvent.GameOver {
+        return GameEvent.GameOver(
+            GameResult(
+                winner = isWinner(),
+                rightAnswersCount = _rightAnswersCount.value,
+                totalQuestionsCount = totalQuestionsCount,
+                gameSettings
+            )
+        )
     }
 
     companion object {

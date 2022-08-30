@@ -2,6 +2,8 @@ package ua.blackwindstudio.ui.game
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -33,11 +35,27 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
         )
     }
 
+    private val optionsList by lazy {
+        val list = mutableListOf<TextView>()
+        list.add(binding.textFirstAnswer)
+        list.add(binding.textSecondAnswer)
+        list.add(binding.textThirdAnswer)
+        list.add(binding.textForthAnswer)
+        list.add(binding.textFifthAnswer)
+        list.add(binding.textSixthAnswer)
+        list.toList()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentGameBinding.bind(view)
 
+        setEventListeners()
+        setOnClickListeners()
+    }
+
+    private fun setEventListeners() {
         lifecycleScope.launch {
             viewModel.gameTimer.collectLatest { formattedTime ->
                 updateGameTimer(formattedTime)
@@ -49,6 +67,7 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
                 updateGameStatusViews(rightAnswersCount)
             }
         }
+
         lifecycleScope.launch {
             viewModel.question.collectLatest { question ->
                 updateGameQuestionViews(question)
@@ -69,7 +88,6 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
                 }
             }
         }
-        setOnClickListeners()
     }
 
     private fun updateGameTimer(formattedTime: String) {
@@ -83,16 +101,16 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
             textVisibleNumber.text = question.visibleNumber.toString()
 
             val answers = question.options
-            textFirstAnswer.text = answers[0].toString()
-            textSecondAnswer.text = answers[1].toString()
-            textThirdAnswer.text = answers[2].toString()
-            textForthAnswer.text = answers[3].toString()
-            textFifthAnswer.text = answers[4].toString()
-            textSixthAnswer.text = answers[5].toString()
+
+            optionsList.forEachIndexed { index, view ->
+                view.text = answers[index].toString()
+            }
         }
     }
 
     private fun updateGameStatusViews(rightAnswersCount: Int) {
+        //TODO Add color change for enough right answers
+        //TODO Add progress bar implementation and color change
         with(binding) {
             textStatus.text = String.format(
                 getString(ua.blackwindstudio.resources.R.string.text_status),
@@ -103,12 +121,9 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
 
     private fun setOnClickListeners() {
         with(binding) {
-            textFirstAnswer.setOnClickListener { viewModel.answerClicked(1) }
-            textSecondAnswer.setOnClickListener { viewModel.answerClicked(2) }
-            textThirdAnswer.setOnClickListener { viewModel.answerClicked(3) }
-            textForthAnswer.setOnClickListener { viewModel.answerClicked(4) }
-            textFifthAnswer.setOnClickListener { viewModel.answerClicked(5) }
-            textSixthAnswer.setOnClickListener { viewModel.answerClicked(6) }
+            optionsList.forEachIndexed { index, view ->
+                view.setOnClickListener { viewModel.answerClicked(index) }
+            }
         }
     }
 
