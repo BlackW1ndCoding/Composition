@@ -14,4 +14,5 @@
     <string name="required_ratio_of_right_answers_s">Required ratio of right answers: %s</string>
     <string name="your_right_answers_ratio_s">Your right answers ratio: %s</string>
     <string name="try_again">Try again</string>
+    <string name="question_mark">?</string>
 </resources>

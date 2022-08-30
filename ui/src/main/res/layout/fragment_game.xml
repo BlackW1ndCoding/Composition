@@ -47,11 +47,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/teal_700"
+        android:text="@string/question_mark"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/text_visible_number"
-        app:layout_constraintTop_toTopOf="@id/text_visible_number"
-        tools:text="7" />
+        app:layout_constraintTop_toTopOf="@id/text_visible_number" />
 
     <TextView
         android:id="@+id/text_status"
