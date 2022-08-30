@@ -46,7 +46,6 @@ class ChooseDifficultyFragment: Fragment(R.layout.fragment_choose_difficulty) {
             .actionChooseDifficultyFragmentToFragmentGame(
                 DifficultyArg.mapFromDifficulty(difficulty)
             )
-
         findNavController().navigate(action)
     }
 }

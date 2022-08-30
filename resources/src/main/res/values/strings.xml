@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Composition</string>
-    <string name="text">Test text</string>
     <string name="button_accept">Got it!</string>
     <string name="number_composition">Number Composition</string>
     <string name="description">Choose correct answer from presented</string>

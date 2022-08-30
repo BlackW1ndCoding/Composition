@@ -46,7 +46,7 @@ object GameRepositoryImpl: GameRepository {
             Difficulty.MEDIUM -> GameSettings(
                 20, 20, 80, 40
             )
-            Difficulty.DIFFICULT -> GameSettings(
+            Difficulty.HARD -> GameSettings(
                 30, 30, 90, 40
             )
         }
