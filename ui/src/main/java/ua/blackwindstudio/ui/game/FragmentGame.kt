@@ -39,6 +39,12 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
         binding = FragmentGameBinding.bind(view)
 
         lifecycleScope.launch {
+            viewModel.gameTimer.collectLatest { formattedTime ->
+                updateGameTimer(formattedTime)
+            }
+        }
+
+        lifecycleScope.launch {
             viewModel.rightAnswersCount.collectLatest { rightAnswersCount ->
                 updateGameStatusViews(rightAnswersCount)
             }
@@ -64,6 +70,10 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
             }
         }
         setOnClickListeners()
+    }
+
+    private fun updateGameTimer(formattedTime: String) {
+        binding.textTimer.text = formattedTime
     }
 
     private fun updateGameQuestionViews(question: Question?) {
