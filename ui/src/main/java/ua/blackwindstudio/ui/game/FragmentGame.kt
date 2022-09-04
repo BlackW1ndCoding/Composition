@@ -1,8 +1,8 @@
 package ua.blackwindstudio.ui.game
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +18,7 @@ import ua.blackwindstudio.ui.R
 import ua.blackwindstudio.ui.args.DifficultyArg
 import ua.blackwindstudio.ui.args.GameResultArg
 import ua.blackwindstudio.ui.databinding.FragmentGameBinding
+import ua.blackwindstudio.ui.model.GameStatus
 import ua.blackwindstudio.ui.utils.autoCleared
 
 class FragmentGame(): Fragment(R.layout.fragment_game) {
@@ -51,8 +52,18 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
 
         binding = FragmentGameBinding.bind(view)
 
+        setupStatusProgressBar()
+
         setEventListeners()
         setOnClickListeners()
+    }
+
+    private fun setupStatusProgressBar() {
+        with(binding.statusProgress) {
+            max = 100
+            min = 0
+            secondaryProgress = viewModel.gameSettings.minRightAnswersPercent
+        }
     }
 
     private fun setEventListeners() {
@@ -63,8 +74,8 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
         }
 
         lifecycleScope.launch {
-            viewModel.rightAnswersCount.collectLatest { rightAnswersCount ->
-                updateGameStatusViews(rightAnswersCount)
+            viewModel.gameStatus.collectLatest { status ->
+                updateGameStatusViews(status)
             }
         }
 
@@ -108,23 +119,39 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
         }
     }
 
-    private fun updateGameStatusViews(rightAnswersCount: Int) {
-        //TODO Add color change for enough right answers
-        //TODO Add progress bar implementation and color change
+    private fun updateGameStatusViews(gameStatus: GameStatus) {
         with(binding) {
-            textStatus.text = String.format(
-                getString(ua.blackwindstudio.resources.R.string.text_status),
-                rightAnswersCount, viewModel.gameSettings.minRightAnswersNumber
-            )
+            textStatus.apply {
+                text = String.format(
+                    getString(ua.blackwindstudio.resources.R.string.text_status),
+                    gameStatus.rightAnswersCount, viewModel.gameSettings.minRightAnswersNumber
+                )
+                setTextColor(
+                    ColorStateList.valueOf(getColorByState(gameStatus.rightAnswersCountIsEnough))
+                )
+            }
+
+            statusProgress.apply {
+                progress = gameStatus.rightAnswersRatio
+                progressTintList =
+                    ColorStateList.valueOf(getColorByState(gameStatus.rightAnswersRatioIsEnough))
+            }
         }
     }
 
     private fun setOnClickListeners() {
-        with(binding) {
-            optionsList.forEachIndexed { index, view ->
-                view.setOnClickListener { viewModel.answerClicked(index) }
-            }
+        optionsList.forEachIndexed { index, view ->
+            view.setOnClickListener { viewModel.answerClicked(index) }
         }
+    }
+
+    private fun getColorByState(state: Boolean): Int {
+        val colorResId = if (state) {
+            android.R.color.holo_green_light
+        } else {
+            android.R.color.holo_red_light
+        }
+        return requireContext().getColor(colorResId)
     }
 
     companion object {

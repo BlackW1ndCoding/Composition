@@ -3,16 +3,14 @@ package ua.blackwindstudio.ui.game
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.domain.models.Difficulty
 import ua.blackwindstudio.domain.models.GameResult
 import ua.blackwindstudio.domain.models.Question
 import ua.blackwindstudio.domain.usecases.GenerateQuestionCase
 import ua.blackwindstudio.domain.usecases.GetGameSettingsCase
+import ua.blackwindstudio.ui.model.GameStatus
 import ua.blackwindstudio.ui.utils.rightAnswer
 import java.lang.ArithmeticException
 
@@ -32,10 +30,16 @@ class GameViewModel(
     private val _question = MutableStateFlow(generateQuestionCase(gameSettings.maxSumValue))
     val question: StateFlow<Question> = _question
 
-    private val _rightAnswersCount = MutableStateFlow(0)
-    val rightAnswersCount: StateFlow<Int> = _rightAnswersCount
-
-    private var totalQuestionsCount = 0
+    private val _gameStatus = MutableStateFlow(
+        GameStatus(
+            0,
+            0,
+            false,
+            0,
+            false
+        )
+    )
+    val gameStatus: StateFlow<GameStatus> = _gameStatus
 
     private val timer = createGameTimer()
 
@@ -51,18 +55,50 @@ class GameViewModel(
     fun answerClicked(position: Int) {
         val question = _question.value
 
-        if (question.rightAnswer == question.options[position]) _rightAnswersCount.value++
-        totalQuestionsCount++
+        val answerIsRight =
+            question.rightAnswer == question.options[position]
 
-        if (checkGameOverCondition()) {
-            gameOver()
-        }
+        updateGameStatus(answerIsRight)
+
         _question.value = generateQuestionCase(gameSettings.maxSumValue)
+    }
+
+    private fun updateGameStatus(answerIsRight: Boolean) {
+        val oldStatus = _gameStatus.value
+        val rightAnswersCount =
+            if (answerIsRight) oldStatus.rightAnswersCount + 1 else oldStatus.rightAnswersCount
+        val totalAnswersCount = oldStatus.totalAnswersCount + 1
+        val rightAnswersIsEnough = rightAnswersIsEnough(rightAnswersCount)
+        val rightAnswersRatio = calculateRightAnswersRatio(rightAnswersCount, totalAnswersCount)
+        _gameStatus.update {
+            GameStatus(
+                rightAnswersCount,
+                totalAnswersCount,
+                rightAnswersIsEnough,
+                rightAnswersRatio,
+                rightAnswersRatioIsEnough(rightAnswersRatio)
+            )
+        }
+    }
+
+    private fun rightAnswersIsEnough(rightAnswers: Int): Boolean {
+        return rightAnswers >= gameSettings.minRightAnswersNumber
+    }
+
+    private fun calculateRightAnswersRatio(rightAnswers: Int, totalAnswers: Int): Int {
+        if (totalAnswers == 0) return 0
+        return (rightAnswers.toDouble() / totalAnswers * 100).toInt()
+    }
+
+    private fun rightAnswersRatioIsEnough(rightAnswersRatio: Int): Boolean {
+        return rightAnswersRatio >= gameSettings.minRightAnswersPercent
     }
 
     private fun isWinner(): Boolean {
         return try {
-            rightAnswersCount.value / totalQuestionsCount * 100 > gameSettings.minRightAnswersPercent
+            val status = gameStatus.value
+            (status.rightAnswersCount.toDouble() / status.totalAnswersCount * 100).toInt() >
+                    gameSettings.minRightAnswersPercent
         } catch (e: ArithmeticException) {
             false
         }
@@ -74,7 +110,7 @@ class GameViewModel(
             MILLIS_IN_SECOND
         ) {
             override fun onTick(millisUntilFinished: Long) {
-                _gameTimer.value = formatTime(millisUntilFinished)
+                _gameTimer.update { formatTime(millisUntilFinished) }
             }
 
             override fun onFinish() {
@@ -90,11 +126,7 @@ class GameViewModel(
             "%02d:%02d", minutes, seconds % SECONDS_IN_MINUTE
         )
     }
-
-    private fun checkGameOverCondition(): Boolean {
-        return _rightAnswersCount.value == gameSettings.minRightAnswersNumber
-    }
-
+    
     private fun gameOver() {
         timer.cancel()
 
@@ -109,8 +141,8 @@ class GameViewModel(
         return GameEvent.GameOver(
             GameResult(
                 winner = isWinner(),
-                rightAnswersCount = _rightAnswersCount.value,
-                totalQuestionsCount = totalQuestionsCount,
+                rightAnswersCount = gameStatus.value.rightAnswersCount,
+                totalQuestionsCount = gameStatus.value.totalAnswersCount,
                 gameSettings
             )
         )
