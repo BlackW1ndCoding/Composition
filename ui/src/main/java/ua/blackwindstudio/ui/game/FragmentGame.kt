@@ -1,6 +1,5 @@
 package ua.blackwindstudio.ui.game
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -12,14 +11,11 @@ import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.data.GameRepositoryImpl
-import ua.blackwindstudio.domain.models.Difficulty
-import ua.blackwindstudio.domain.models.Question
 import ua.blackwindstudio.domain.usecases.GenerateQuestionCase
 import ua.blackwindstudio.domain.usecases.GetGameSettingsCase
 import ua.blackwindstudio.ui.R
 import ua.blackwindstudio.ui.args.GameResultArg
 import ua.blackwindstudio.ui.databinding.FragmentGameBinding
-import ua.blackwindstudio.ui.model.GameStatus
 import ua.blackwindstudio.ui.utils.autoCleared
 
 class FragmentGame: Fragment(R.layout.fragment_game) {
@@ -50,36 +46,28 @@ class FragmentGame: Fragment(R.layout.fragment_game) {
 
         binding = FragmentGameBinding.bind(view)
 
-        setupStatusProgressBar()
+        binding.setupStatusProgressBar(viewModel)
 
         setEventListeners()
         setOnClickListeners()
     }
 
-    private fun setupStatusProgressBar() {
-        with(binding.statusProgress) {
-            max = 100
-            min = 0
-            secondaryProgress = viewModel.gameSettings.minRightAnswersPercent
-        }
-    }
-
     private fun setEventListeners() {
         lifecycleScope.launch {
             viewModel.gameTimer.collectLatest { formattedTime ->
-                updateGameTimer(formattedTime)
+                binding.updateGameTimer(formattedTime)
             }
         }
 
         lifecycleScope.launch {
             viewModel.gameStatus.collectLatest { status ->
-                updateGameStatusViews(status)
+                binding.updateGameStatusViews(requireContext(), viewModel, status)
             }
         }
 
         lifecycleScope.launch {
             viewModel.question.collectLatest { question ->
-                updateGameQuestionViews(question)
+                binding.updateGameQuestionViews(question, optionsList)
             }
         }
 
@@ -99,56 +87,9 @@ class FragmentGame: Fragment(R.layout.fragment_game) {
         }
     }
 
-    private fun updateGameTimer(formattedTime: String) {
-        binding.textTimer.text = formattedTime
-    }
-
-    private fun updateGameQuestionViews(question: Question?) {
-        with(binding) {
-            require(question != null)
-            textSum.text = question.sum.toString()
-            textVisibleNumber.text = question.visibleNumber.toString()
-
-            val answers = question.options
-
-            optionsList.forEachIndexed { index, view ->
-                view.text = answers[index].toString()
-            }
-        }
-    }
-
-    private fun updateGameStatusViews(gameStatus: GameStatus) {
-        with(binding) {
-            textStatus.apply {
-                text = String.format(
-                    getString(ua.blackwindstudio.resources.R.string.text_status),
-                    gameStatus.rightAnswersCount, viewModel.gameSettings.minRightAnswersNumber
-                )
-                setTextColor(
-                    ColorStateList.valueOf(getColorByState(gameStatus.rightAnswersCountIsEnough))
-                )
-            }
-
-            statusProgress.apply {
-                progress = gameStatus.rightAnswersRatio
-                progressTintList =
-                    ColorStateList.valueOf(getColorByState(gameStatus.rightAnswersRatioIsEnough))
-            }
-        }
-    }
-
     private fun setOnClickListeners() {
         optionsList.forEachIndexed { index, view ->
             view.setOnClickListener { viewModel.answerClicked(index) }
         }
-    }
-
-    private fun getColorByState(state: Boolean): Int {
-        val colorResId = if (state) {
-            android.R.color.holo_green_light
-        } else {
-            android.R.color.holo_red_light
-        }
-        return requireContext().getColor(colorResId)
     }
 }

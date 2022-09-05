@@ -17,27 +17,7 @@ class ChooseDifficultyFragment: Fragment(R.layout.fragment_choose_difficulty) {
 
         binding = FragmentChooseDifficultyBinding.bind(view)
 
-        addClickListeners()
-    }
-
-    private fun addClickListeners() {
-        with(binding) {
-            buttonDifficultyTest.setOnClickListener {
-                navigateToGameFragment(Difficulty.TEST)
-            }
-
-            buttonDifficultyEasy.setOnClickListener {
-                navigateToGameFragment(Difficulty.EASY)
-            }
-
-            buttonDifficultyMedium.setOnClickListener {
-                navigateToGameFragment(Difficulty.MEDIUM)
-            }
-
-            buttonDifficultyHard.setOnClickListener {
-                navigateToGameFragment(Difficulty.HARD)
-            }
-        }
+        binding.setClickListeners(::navigateToGameFragment)
     }
 
     private fun navigateToGameFragment(difficulty: Difficulty) {
