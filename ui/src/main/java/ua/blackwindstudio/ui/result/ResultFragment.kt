@@ -1,17 +1,20 @@
 package ua.blackwindstudio.ui.result
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import ua.blackwindstudio.domain.models.GameResult
 import ua.blackwindstudio.ui.R
 import ua.blackwindstudio.ui.args.GameResultArg
 import ua.blackwindstudio.ui.databinding.FragmentResultBinding
 import ua.blackwindstudio.ui.utils.autoCleared
-import java.lang.IllegalArgumentException
 
 class ResultFragment: Fragment(R.layout.fragment_result) {
+    private val args by navArgs<ResultFragmentArgs>()
+
     private var binding by autoCleared<FragmentResultBinding>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -20,19 +23,23 @@ class ResultFragment: Fragment(R.layout.fragment_result) {
         binding = FragmentResultBinding.bind(view)
 
         renderViewValues(
-            GameResultArg.mapToGameResult(
-                arguments?.getParcelable(GAME_RESULT_ARG)
-                    ?: throw IllegalArgumentException("GameResult argument is required")
-            )
+            GameResultArg.mapToGameResult(args.gameResultArg)
         )
 
         binding.buttonTryAgain.setOnClickListener {
-            findNavController().navigate(R.id.action_resultFragment_to_chooseDifficultyFragment)
+            findNavController().popBackStack()
         }
     }
 
     private fun renderViewValues(result: GameResult) {
         with(binding) {
+            imageFace.imageTintList =
+                ColorStateList.valueOf(
+                    requireContext().getColor(
+                        if (result.winner) android.R.color.holo_green_light else android.R.color.holo_red_light
+                    )
+                )
+
             textRequiredAnswers.text =
                 String.format(
                     getString(ua.blackwindstudio.resources.R.string.required_number_of_right_answers_s),
@@ -60,8 +67,4 @@ class ResultFragment: Fragment(R.layout.fragment_result) {
 
     private fun calculateRightAnswersRation(result: GameResult) =
         (result.rightAnswersCount.toDouble() / result.totalQuestionsCount * 100).toInt()
-
-    companion object {
-        const val GAME_RESULT_ARG = "GAME_RESULT_ARG"
-    }
 }

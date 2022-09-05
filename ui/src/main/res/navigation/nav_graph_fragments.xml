@@ -25,21 +25,20 @@
         android:name="ua.blackwindstudio.ui.game.FragmentGame"
         android:label="FragmentGame" >
         <argument
-            android:name="DIFFICULTY_LEVEL_ARG"
-            app:argType="ua.blackwindstudio.ui.args.DifficultyArg" />
+            android:name="difficulty_level_arg"
+            app:argType="ua.blackwindstudio.domain.models.Difficulty" />
         <action
             android:id="@+id/action_fragmentGame_to_resultFragment"
-            app:destination="@id/resultFragment" />
+            app:destination="@id/resultFragment"
+            app:popUpTo="@id/chooseDifficultyFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/resultFragment"
         android:name="ua.blackwindstudio.ui.result.ResultFragment"
         android:label="ResultFragment" >
         <argument
-            android:name="GAME_RESULT_ARG"
+            android:name="game_result_arg"
             app:argType="ua.blackwindstudio.ui.args.GameResultArg" />
-        <action
-            android:id="@+id/action_resultFragment_to_chooseDifficultyFragment"
-            app:destination="@id/chooseDifficultyFragment" />
     </fragment>
 </navigation>

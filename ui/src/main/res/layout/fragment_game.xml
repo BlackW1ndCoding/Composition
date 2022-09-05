@@ -72,9 +72,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:progressTint="#4DB6AC"
+        app:layout_constraintVertical_bias="0.01"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_status" />
+        app:layout_constraintTop_toBottomOf="@id/text_status"
+        app:layout_constraintBottom_toTopOf="@id/guideline"/>
 
     <GridLayout
         android:id="@+id/gridLayout"

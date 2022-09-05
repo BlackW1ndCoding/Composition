@@ -12,7 +12,6 @@ import ua.blackwindstudio.domain.usecases.GenerateQuestionCase
 import ua.blackwindstudio.domain.usecases.GetGameSettingsCase
 import ua.blackwindstudio.ui.model.GameStatus
 import ua.blackwindstudio.ui.utils.rightAnswer
-import java.lang.ArithmeticException
 
 class GameViewModel(
     difficulty: Difficulty,
@@ -97,8 +96,9 @@ class GameViewModel(
     private fun isWinner(): Boolean {
         return try {
             val status = gameStatus.value
-            (status.rightAnswersCount.toDouble() / status.totalAnswersCount * 100).toInt() >
-                    gameSettings.minRightAnswersPercent
+            (status.rightAnswersCount.toDouble() / status.totalAnswersCount * 100).toInt() >=
+                    gameSettings.minRightAnswersPercent &&
+                    status.rightAnswersCount >= gameSettings.minRightAnswersNumber
         } catch (e: ArithmeticException) {
             false
         }
@@ -126,7 +126,7 @@ class GameViewModel(
             "%02d:%02d", minutes, seconds % SECONDS_IN_MINUTE
         )
     }
-    
+
     private fun gameOver() {
         timer.cancel()
 

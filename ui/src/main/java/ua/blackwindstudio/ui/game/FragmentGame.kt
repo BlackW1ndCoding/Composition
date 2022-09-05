@@ -8,28 +8,26 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ua.blackwindstudio.data.GameRepositoryImpl
+import ua.blackwindstudio.domain.models.Difficulty
 import ua.blackwindstudio.domain.models.Question
 import ua.blackwindstudio.domain.usecases.GenerateQuestionCase
 import ua.blackwindstudio.domain.usecases.GetGameSettingsCase
 import ua.blackwindstudio.ui.R
-import ua.blackwindstudio.ui.args.DifficultyArg
 import ua.blackwindstudio.ui.args.GameResultArg
 import ua.blackwindstudio.ui.databinding.FragmentGameBinding
 import ua.blackwindstudio.ui.model.GameStatus
 import ua.blackwindstudio.ui.utils.autoCleared
 
-class FragmentGame(): Fragment(R.layout.fragment_game) {
+class FragmentGame: Fragment(R.layout.fragment_game) {
+    private val args by navArgs<FragmentGameArgs>()
     private var binding by autoCleared<FragmentGameBinding>()
     private val viewModel by viewModels<GameViewModel> {
         GameViewModelFactory(
-            DifficultyArg.mapToDifficulty(
-                arguments?.getParcelable(
-                    DIFFICULTY_LEVEL_ARG
-                ) ?: throw IllegalArgumentException("Must provide Difficulty argument")
-            ),
+            args.difficultyLevelArg,
             GetGameSettingsCase(GameRepositoryImpl),
             GenerateQuestionCase(GameRepositoryImpl),
             requireActivity().application,
@@ -152,9 +150,5 @@ class FragmentGame(): Fragment(R.layout.fragment_game) {
             android.R.color.holo_red_light
         }
         return requireContext().getColor(colorResId)
-    }
-
-    companion object {
-        const val DIFFICULTY_LEVEL_ARG = "DIFFICULTY_LEVEL_ARG"
     }
 }
