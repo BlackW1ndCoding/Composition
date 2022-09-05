@@ -11,11 +11,11 @@ fun FragmentGameBinding.updateGameTimer(formattedTime: String) {
     textTimer.text = formattedTime
 }
 
-fun FragmentGameBinding.setupStatusProgressBar(viewModel: GameViewModel) {
+fun FragmentGameBinding.setupStatusProgressBar(minRightAnswersRatio: Int) {
     with(statusProgress) {
         max = 100
         min = 0
-        secondaryProgress = viewModel.gameSettings.minRightAnswersPercent
+        secondaryProgress = minRightAnswersRatio
     }
 }
 
@@ -33,7 +33,6 @@ fun FragmentGameBinding.updateGameQuestionViews(question: Question?, optionsList
 }
 
 fun FragmentGameBinding.updateGameStatusViews(
-    context: Context,
     viewModel: GameViewModel,
     gameStatus: GameStatus
 ) {
@@ -50,7 +49,7 @@ fun FragmentGameBinding.updateGameStatusViews(
     statusProgress.apply {
         progress = gameStatus.rightAnswersRatio
         progressTintList =
-            ColorStateList.valueOf(getColorByState(context, gameStatus.rightAnswersRatioIsEnough))
+            ColorStateList.valueOf(getColorByState(this.context, gameStatus.rightAnswersRatioIsEnough))
     }
 }
 

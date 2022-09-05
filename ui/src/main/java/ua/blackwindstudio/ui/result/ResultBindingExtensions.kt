@@ -1,11 +1,11 @@
 package ua.blackwindstudio.ui.result
 
-import android.content.Context
 import android.content.res.ColorStateList
 import ua.blackwindstudio.domain.models.GameResult
 import ua.blackwindstudio.ui.databinding.FragmentResultBinding
 
-fun FragmentResultBinding.renderViewValues(context: Context, result: GameResult) {
+fun FragmentResultBinding.renderViewValues(result: GameResult) {
+    val context = this.root.context
     imageFace.imageTintList =
         ColorStateList.valueOf(
             context.getColor(

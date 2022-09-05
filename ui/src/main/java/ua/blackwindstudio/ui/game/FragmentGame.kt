@@ -46,7 +46,7 @@ class FragmentGame: Fragment(R.layout.fragment_game) {
 
         binding = FragmentGameBinding.bind(view)
 
-        binding.setupStatusProgressBar(viewModel)
+        binding.setupStatusProgressBar(viewModel.gameSettings.minRightAnswersPercent)
 
         setEventListeners()
         setOnClickListeners()
@@ -61,7 +61,7 @@ class FragmentGame: Fragment(R.layout.fragment_game) {
 
         lifecycleScope.launch {
             viewModel.gameStatus.collectLatest { status ->
-                binding.updateGameStatusViews(requireContext(), viewModel, status)
+                binding.updateGameStatusViews(viewModel, status)
             }
         }
 
